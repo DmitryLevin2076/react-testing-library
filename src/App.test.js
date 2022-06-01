@@ -204,3 +204,27 @@ describe('App', () => {
     expect(await screen.findByText(/Logged in as/i)).toBeInTheDocument()
   });
 })
+
+// Assertive Functions:
+// - toBeDisabled
+// - toBeEmptyDOMElement
+// - toBeRequired
+// - toContainElement
+// - toHaveClass
+// - toHaveStyle
+// - toHaveDisplayValue
+// - toHaveDescription
+// - toBeEnabled
+// - toBeInTheDocument
+// - toBeValid
+// - toContainHTML
+// - toHaveFocus
+// - toHaveTextContent
+// - toBeChecked
+// - toBeEmpty
+// - toBeInvalid
+// - toBeVisible
+// - toHaveAttribute
+// - toHaveFormValues
+// - toHaveValue
+// - toBePartiallyChecked
