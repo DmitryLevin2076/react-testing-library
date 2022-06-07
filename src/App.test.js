@@ -170,40 +170,45 @@
 //     return expect(fetchData()).resolves.toBe('peanut butter');
 // });
 
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen, fireEvent, findByText } from '@testing-library/react';
+import App, { URL } from './App';
+import userEvent from "@testing-library/user-event";
+import { useEffect } from "react";
+import axios from "axios";
 
-describe('App', () => {
-  it('renders App component', function () {
-    render(<App />)
-    screen.debug() // отображает дерево
+// describe('App', () => {
+//   it('renders App component', function () {
+//     render(<App />)
+//     screen.debug() // отображает дерево
+//
+//
+//     // getBy... - возвращает соответствующий узел, либо ошибку если нет совпадающих элементов или если найдено более одного совпадения (используйте getAllBy)
+//     // getAllBy... - возвращает массив всех совпадающих узлов для запроса и выдает ошибку, если нет совпадающих элементов.
+//     expect(screen.getByText(/Search:/i)).toBeInTheDocument() // ищет текст
+//     expect(screen.getByRole('textbox')).toBeInTheDocument() // ищет по роли - checkbox, textbox и тд
+//     expect(screen.getByLabelText(/search/i)).toBeInTheDocument() // ищет <label>
+//     expect(screen.getByPlaceholderText('search text...')).toBeInTheDocument() // ищет элементы по плейсхолдеру
+//     expect(screen.getByAltText('search image')).toBeInTheDocument() // ищет элементы по альтернативному тексту
+//     expect(screen.getByDisplayValue('')).toBeInTheDocument() // поиск элемента по отображаемому значению или по атрибуту value
+//
+//     // queryBy... - возвращает соответствующий узел, либо null если нет соответствующих элементов. Это полезно для утверждения элемента, которого нет. Выдает ошибку, если найдено более одного совпадения (используйте queryAllBy)
+//     // queryAllBy... - возвращает массив всех совпадающих узлов для запроса и возвращает пустой массив ( []), если нет совпадающих элементов.
+//     expect(screen.queryByText(/Searches for React/i)).toBeNull()
+//   });
+// })
 
+// describe('App', () => {
+//   it('renders App component async test', async function () {
+//     render(<App />)
+//
+//     // findBy... - возвращает промис, который разрешается, когда найден элемент, соответствующий заданному запросу. Обещание отклоняется, если элемент не найден или если найдено более одного элемента после тайм-аута по умолчанию, равного 1000 мс. Если вам нужно найти более одного элемента используйте findAllBy.
+//     // findAllBy... - возвращает обещание, которое разрешается в массив элементов, когда найдены какие-либо элементы, соответствующие заданному запросу. Обещание отклоняется, если после тайм-аута по умолчанию, равного 1000мс, не найдено ни одного элемента.
+//     expect(screen.queryByText(/Logged in as/i)).toBeNull()
+//     expect(await screen.findByText(/Logged in as/i)).toBeInTheDocument()
+//   });
+// })
 
-    // getBy... - возвращает соответствующий узел, либо ошибку если нет совпадающих элементов или если найдено более одного совпадения (используйте getAllBy)
-    // getAllBy... - возвращает массив всех совпадающих узлов для запроса и выдает ошибку, если нет совпадающих элементов.
-    expect(screen.getByText(/Search:/i)).toBeInTheDocument() // ищет текст
-    expect(screen.getByRole('textbox')).toBeInTheDocument() // ищет по роли - checkbox, textbox и тд
-    expect(screen.getByLabelText(/search/i)).toBeInTheDocument() // ищет <label>
-    expect(screen.getByPlaceholderText('search text...')).toBeInTheDocument() // ищет элементы по плейсхолдеру
-    expect(screen.getByAltText('search image')).toBeInTheDocument() // ищет элементы по альтернативному тексту
-    expect(screen.getByDisplayValue('')).toBeInTheDocument() // поиск элемента по отображаемому значению или по атрибуту value
-
-    // queryBy... - возвращает соответствующий узел, либо null если нет соответствующих элементов. Это полезно для утверждения элемента, которого нет. Выдает ошибку, если найдено более одного совпадения (используйте queryAllBy)
-    // queryAllBy... - возвращает массив всех совпадающих узлов для запроса и возвращает пустой массив ( []), если нет совпадающих элементов.
-    expect(screen.queryByText(/Searches for React/i)).toBeNull()
-  });
-})
-
-describe('App', () => {
-  it('renders App component async test', async function () {
-    render(<App />)
-
-    // findBy... - возвращает промис, который разрешается, когда найден элемент, соответствующий заданному запросу. Обещание отклоняется, если элемент не найден или если найдено более одного элемента после тайм-аута по умолчанию, равного 1000 мс. Если вам нужно найти более одного элемента используйте findAllBy.
-    // findAllBy... - возвращает обещание, которое разрешается в массив элементов, когда найдены какие-либо элементы, соответствующие заданному запросу. Обещание отклоняется, если после тайм-аута по умолчанию, равного 1000мс, не найдено ни одного элемента.
-    expect(screen.queryByText(/Logged in as/i)).toBeNull()
-    expect(await screen.findByText(/Logged in as/i)).toBeInTheDocument()
-  });
-})
+///######
 
 // Assertive Functions:
 // - toBeDisabled
@@ -228,3 +233,149 @@ describe('App', () => {
 // - toHaveFormValues
 // - toHaveValue
 // - toBePartiallyChecked
+
+/** fireEvent **/
+
+// describe('App', () => {
+//     test('renders App component', async () => {
+//         render(<App/>)
+//         await screen.findByText(/Logged in as/i)
+//         expect(screen.queryByText(/Searches for Dimanya/)).toBeNull()
+//         fireEvent.change(screen.getByRole('textbox'), {
+//             target: { value: 'Dimanya' },
+//         })
+//         expect(screen.queryByText(/Searches for Dimanya/)).toBeInTheDocument()
+//     })
+// })
+
+// describe('events', () => {
+//     it('checkbox click', () => {
+//         const handleChange = jest.fn()
+//         const { container } = render(
+//             <input type="checkbox" onChange={handleChange} />
+//         )
+//         const checkbox = container.firstChild
+//         expect(checkbox).not.toBeChecked()
+//         fireEvent.click(checkbox)
+//         expect(checkbox).toBeChecked()
+//     });
+//
+//     it('input focus', () => {
+//         const {getByTestId} = render(
+//             <input type="text" data-testid="simple-input" />
+//         )
+//         const input = getByTestId('simple-input')
+//         expect(input).not.toHaveFocus()
+//         input.focus()
+//         expect(input).toHaveFocus()
+//     });
+// })
+
+/** userEvent **/
+
+// describe('App', () => {
+//     test('renders App component', async () => {
+//         render(<App/>)
+//         await screen.findByText(/Logged in as/i)
+//         expect(screen.queryByText(/Searches for Dimanya/)).toBeNull()
+//         // fireEvent.change(screen.getByRole('textbox'), {
+//         //     target: { value: 'Dimanya' },
+//         // })
+//         userEvent.type(screen.getByRole('textbox'), 'Dimanya')
+//         expect(screen.queryByText(/Searches for Dimanya/)).toBeInTheDocument()
+//     })
+// })
+
+// describe('events', () => {
+//     it('checkbox click', () => {
+//         const handleChange = jest.fn()
+//         const { container } = render(
+//             <input type="checkbox" onChange={handleChange} />
+//         )
+//         const checkbox = container.firstChild
+//         expect(checkbox).not.toBeChecked()
+//         // fireEvent.click(checkbox)
+//         userEvent.click(checkbox)
+//         // userEvent.click(checkbox, { ctrlKey: true, shiftKey: true })
+//         expect(checkbox).toBeChecked()
+//     });
+//
+//     it('double click', () => {
+//         const onChange = jest.fn()
+//         const { container } = render(<input type="checkbox" onChange={onChange} />)
+//         const checkbox = container.firstChild
+//         expect(checkbox).not.toBeChecked()
+//         userEvent.dblClick(checkbox)
+//         expect(onChange).toHaveBeenCalledTimes(2)
+//     });
+//
+//     it('tab', () => {
+//         const { getAllByTestId } = render(
+//             <div>
+//                 <input data-testId='element' type="checkbox" />
+//                 <input data-testId='element' type="radio" />
+//                 <input data-testId='element' type="number" />
+//             </div>
+//         )
+//         const [checkbox, radio, number] = getAllByTestId('element')
+//         userEvent.tab()
+//         expect(checkbox).toHaveFocus()
+//         userEvent.tab()
+//         expect(radio).toHaveFocus()
+//         userEvent.tab()
+//         expect(number).toHaveFocus()
+//     });
+//
+//     it('select options', () => {
+//         const { selectOptions, getByRole, getByText } = render(
+//             <select>
+//                 <option value="1">A</option>
+//                 <option value="2">B</option>
+//                 <option value="3">C</option>
+//             </select>
+//         )
+//
+//         userEvent.selectOptions(getByRole('combobox'), '1')
+//         expect(getByText('A').selected).toBeTruthy()
+//
+//         userEvent.selectOptions(getByRole('combobox'), '2')
+//         expect(getByText('B').selected).toBeTruthy()
+//         expect(getByText('A').selected).toBeFalsy()
+//     });
+// })
+
+/** Async test **/
+
+jest.mock('axios')
+
+const hits = [
+    {
+        objectId: '1',
+        title: 'Angular'
+    },
+    {
+        objectId: '2',
+        title: 'React'
+    },
+]
+
+describe('App', () => {
+    it('fetches news from an API', async () => {
+        axios.get.mockImplementationOnce(() => Promise.resolve({ data: { hits } }))
+        const { getByRole, findAllByRole } = render(<App />)
+        userEvent.click(getByRole('button'))
+        const items = await findAllByRole('listitem')
+        expect(items).toHaveLength(2)
+        // Additional
+        expect(axios.get).toHaveBeenCalledTimes(1)
+        expect(axios.get).toHaveBeenCalledWith(`${URL}?query=React`)
+    });
+
+    it('fetches news from an API and reject', async () => {
+        axios.get.mockImplementationOnce(() => Promise.reject(new Error()))
+        const { getByRole, findByText } = render(<App />)
+        userEvent.click(getByRole('button'))
+        const message = await findByText(/Something went wrong/)
+        expect(message).toBeInTheDocument()
+    });
+})
