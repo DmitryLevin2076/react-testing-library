@@ -13,3 +13,4 @@ test('should fetch users', () => {
 
     return Users.all().then(data => expect(data).toEqual(users));
 });
+
