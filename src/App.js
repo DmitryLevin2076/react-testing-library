@@ -1,28 +1,27 @@
+import logo from './logo.svg';
 import './App.css';
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export const URL = 'https://hn.algolia.com/api/v1/search'
+const URL = 'http://hn.algolia.com/api/v1/search'
 
-const getUser = () => Promise.resolve({ id: 1, name: "Yauhen" })
+const getUser = () => Promise.resolve({ id: 1, name: 'Dima' })
 
 const Search = ({ value, onChange, children }) => (
     <div>
         <label htmlFor="search">{children}</label>
         <input
-            placeholder="search text..."
             id="search"
             type="text"
             value={value}
-            onChange={onChange}
-        />
+            placeholder="search text..."
+            onChange={onChange} />
     </div>
 )
 
 function App() {
     const [search, setSearch] = useState('')
-    const [user, setUser] = useState('')
-
+    const [user, setUser] = useState(undefined)
     const [news, setNews] = useState([])
     const [error, setError] = useState(null)
 
@@ -49,28 +48,29 @@ function App() {
 
     return (
         <div>
-            {user && <h2>Logged in as {user.name}</h2>}
-            <img src="" alt="search image" />
-            <Search value={search} onChange={handleChange}>
-                Search:
-            </Search>
-            <p>Searches for {search ? search : "..."}</p>
-
-            <div>
-                <button type='button' onClick={handleFetch}>
+            <>
+                {user && <h2>Logged in as {user.name}</h2>}
+                <img src="" alt="search image" />
+                <Search value={search} onChange={handleChange}>
+                    Search:
+                </Search>
+                <p>Searches for {search ? search : '...'}</p>
+            </>
+            <>
+                <button type="button" onClick={handleFetch}>
                     Fetch News
                 </button>
 
                 {error && <span>Something went wrong ...</span>}
 
-                <ul>
+                <ul data-testid='ul-test-id'>
                     {news.map(({ objectID, url, title }) => (
                         <li key={objectID}>
                             <a href={url}>{title}</a>
                         </li>
                     ))}
                 </ul>
-            </div>
+            </>
         </div>
     );
 }
