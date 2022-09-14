@@ -4,7 +4,7 @@ import App from './App';
 import axios from "axios";
 import { act } from "react-dom/test-utils";
 
-/** userEvent **/
+/** fireEvent / userEvent **/
 
 describe('App', () => {
     it('renders App component', async () => {
@@ -16,6 +16,20 @@ describe('App', () => {
         // })
         userEvent.type(screen.getByRole('textbox'), 'React')
         expect(screen.queryByText(/Searches for React/)).toBeInTheDocument()
+
+        //
+        expect(screen.getByLabelText(/search/i)).toBeRequired()
+        expect(screen.getByLabelText(/search/i)).toBeEmptyDOMElement()
+        expect(screen.getByLabelText(/search/i)).toHaveAttribute('id')
+        expect(screen.getByLabelText(/search/i)).toHaveAttribute('type')
+        expect(screen.getByLabelText(/search/i)).toHaveAttribute('value')
+        //
+        expect(screen.getByText(/Search:/i)).toBeInTheDocument()
+        expect(screen.getByRole('textbox')).toBeInTheDocument()
+        expect(screen.getByLabelText(/search/i)).toBeInTheDocument()
+        expect(screen.getByPlaceholderText('search text...')).toBeInTheDocument()
+        expect(screen.getByAltText('search image')).toBeInTheDocument()
+        expect(screen.queryByDisplayValue('')).not.toBeInTheDocument()
     });
 })
 
@@ -85,19 +99,6 @@ describe('events', () => {
         userEvent.selectOptions(getByRole('combobox'), '2')
         expect(getByText('B').selected).toBeTruthy()
         expect(getByText('A').selected).toBeFalsy()
-    });
-
-    /** fireEvent **/
-
-    it('checkbox click', () => {
-        const handleChange = jest.fn()
-        const { container } = render(
-            <input type="checkbox" onChange={handleChange} />
-        )
-        const checkbox = container.firstChild
-        expect(checkbox).not.toBeChecked()
-        fireEvent.click(checkbox)
-        expect(checkbox).toBeChecked()
     });
 })
 

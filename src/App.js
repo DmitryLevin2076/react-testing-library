@@ -15,7 +15,9 @@ const Search = ({ value, onChange, children }) => (
             type="text"
             value={value}
             placeholder="search text..."
-            onChange={onChange} />
+            onChange={onChange}
+            required
+        />
     </div>
 )
 
