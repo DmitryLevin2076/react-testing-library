@@ -1,7 +1,6 @@
-import logo from './logo.svg';
-import './App.css';
 import { useEffect, useState } from "react";
 import axios from "axios";
+import UlbiTVAppComponent from "./UlbiTVAppComponent/UlbiTVAppComponent";
 
 const URL = 'http://hn.algolia.com/api/v1/search'
 
@@ -11,6 +10,7 @@ const Search = ({ value, onChange, children }) => (
     <div>
         <label htmlFor="search">{children}</label>
         <input
+            data-testid="textbox"
             id="search"
             type="text"
             value={value}
@@ -73,6 +73,7 @@ function App() {
                     ))}
                 </ul>
             </>
+            <UlbiTVAppComponent />
         </div>
     );
 }

@@ -41,5 +41,8 @@
       "last 1 safari version"
     ]
   },
-  "author": "Dmitry"
+  "author": "Dmitry",
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.18.6"
+  }
 }

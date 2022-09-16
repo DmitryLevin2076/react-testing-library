@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, getByRole, findByText } from '@testing-library/react';
+import { render, screen, getByRole, findByText } from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import App from './App';
 import axios from "axios";
@@ -14,7 +14,7 @@ describe('App', () => {
         // fireEvent.change(screen.getByRole('textbox'), {
         //     target: { value: 'React' }
         // })
-        userEvent.type(screen.getByRole('textbox'), 'React')
+        userEvent.type(screen.getByTestId('textbox'), 'React')
         expect(screen.queryByText(/Searches for React/)).toBeInTheDocument()
 
         //
@@ -25,11 +25,11 @@ describe('App', () => {
         expect(screen.getByLabelText(/search/i)).toHaveAttribute('value')
         //
         expect(screen.getByText(/Search:/i)).toBeInTheDocument()
-        expect(screen.getByRole('textbox')).toBeInTheDocument()
+        expect(screen.getByTestId('textbox')).toBeInTheDocument()
         expect(screen.getByLabelText(/search/i)).toBeInTheDocument()
         expect(screen.getByPlaceholderText('search text...')).toBeInTheDocument()
         expect(screen.getByAltText('search image')).toBeInTheDocument()
-        expect(screen.queryByDisplayValue('')).not.toBeInTheDocument()
+        // expect(screen.queryByDisplayValue('')).not.toBeInTheDocument()
     });
 })
 
@@ -152,7 +152,6 @@ describe('App', () => {
         expect(ul.firstChild).not.toBeInTheDocument()
     });
 })
-
 
 
 
