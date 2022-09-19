@@ -1,7 +1,25 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 
-const UlbiTVAppComponent = () => {
-    // from Ulbi TV
+const URL = 'http://hn.algolia.com/api/v1/search'
+
+const getUser = () => Promise.resolve({ id: 1, name: 'Dima' })
+
+const Search = ({ value, onChange, children }) => (
+    <div>
+        <label htmlFor="search">{children}</label>
+        <input
+            data-testid="textbox"
+            id="search"
+            type="text"
+            value={value}
+            placeholder="search text..."
+            onChange={onChange}
+            required
+        />
+    </div>
+)
+
+const MainPage = () => {
     const [data, setData] = useState(null)
     const [toggle, setToggle] = useState(false)
     const [value, setValue] = useState('')
@@ -13,9 +31,10 @@ const UlbiTVAppComponent = () => {
             setData(true)
         }, 1000)
     }, [])
-    //
+
     return (
-        <div>
+        <div data-testid="main-page">
+            MAIN PAGE
             <h1 data-testid="value-elem">{value}</h1>
             {toggle === true && <div data-testid="toggle-elem">toggle</div>}
             {data ? <div style={{ color: 'red' }}>data</div> : <div>nan</div>}
@@ -26,4 +45,4 @@ const UlbiTVAppComponent = () => {
     )
 }
 
-export default UlbiTVAppComponent
+export default MainPage

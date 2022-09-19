@@ -1,160 +1,79 @@
-import { render, screen, getByRole, findByText } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import App from './App';
-import axios from "axios";
-import { act } from "react-dom/test-utils";
+import MainPage from "./pages/MainPage";
 
-/** fireEvent / userEvent **/
+describe('TEST APP FROM Ulbi TV', () => {
+    it('renders learn react link', () => {
+        render(<MainPage />)
+        const helloWorld = screen.getByText(/hello world/i)
+        const btn = screen.getByTestId('toggle-btn')
+        const input = screen.getByPlaceholderText(/input value/i)
+        expect(helloWorld).toBeInTheDocument()
+        expect(btn).toBeInTheDocument()
+        expect(input).toBeInTheDocument()
+        // Snapshot
+        expect(input).toMatchSnapshot()
+    });
 
-describe('App', () => {
-    it('renders App component', async () => {
-        render(<App />)
-        await screen.findByText(/Logged in as/i)
-        expect(screen.queryByText(/Searches for React/)).toBeNull()
-        // fireEvent.change(screen.getByRole('textbox'), {
-        //     target: { value: 'React' }
+    it('Пример с queryBy', () => {
+        render(<MainPage />)
+        const helloWorldElem = screen.queryByText(/hello1/i)
+        expect(helloWorldElem).toBeNull()
+    });
+
+    it('Пример с waitFor', async () => {
+        render(<MainPage />)
+
+        const data = await waitFor(() => screen.getByText(/data/i)
+            , {
+                timeout: 2000
+            })
+
+        expect(data).toBeInTheDocument()
+        expect(data).toHaveStyle({ color: 'red' })
+
+        // await waitFor(() => {
+        //     expect(screen.getByText(/data/i)).toBeInTheDocument()
+        //     expect(screen.getByText(/data/i)).toHaveStyle({ color: 'red' })
+        // }, {
+        //     timeout: 2000
         // })
-        userEvent.type(screen.getByTestId('textbox'), 'React')
-        expect(screen.queryByText(/Searches for React/)).toBeInTheDocument()
-
-        //
-        expect(screen.getByLabelText(/search/i)).toBeRequired()
-        expect(screen.getByLabelText(/search/i)).toBeEmptyDOMElement()
-        expect(screen.getByLabelText(/search/i)).toHaveAttribute('id')
-        expect(screen.getByLabelText(/search/i)).toHaveAttribute('type')
-        expect(screen.getByLabelText(/search/i)).toHaveAttribute('value')
-        //
-        expect(screen.getByText(/Search:/i)).toBeInTheDocument()
-        expect(screen.getByTestId('textbox')).toBeInTheDocument()
-        expect(screen.getByLabelText(/search/i)).toBeInTheDocument()
-        expect(screen.getByPlaceholderText('search text...')).toBeInTheDocument()
-        expect(screen.getByAltText('search image')).toBeInTheDocument()
-        // expect(screen.queryByDisplayValue('')).not.toBeInTheDocument()
     });
+
+    it('Пример с findBy', async () => {
+        render(<MainPage />)
+
+        const dataElem = await screen.findByText(/data/i, {}, { timeout: 2000 })
+        expect(dataElem).toBeInTheDocument()
+        expect(dataElem).toHaveStyle({ color: 'red' })
+    });
+
+    it('CLICK EVENT', () => {
+        render(<MainPage />)
+        const btn = screen.getByTestId('toggle-btn')
+        expect(screen.queryByTestId('toggle-elem')).toBeNull()
+        fireEvent.click(btn)
+        expect(screen.queryByTestId('toggle-elem')).toBeInTheDocument()
+        fireEvent.click(btn)
+        expect(screen.queryByTestId('toggle-elem')).toBeNull()
+    })
+
+    it('fireEvent', () => {
+        render(<MainPage />)
+        const input = screen.getByPlaceholderText(/input value/i)
+        expect(screen.queryByTestId('value-elem')).toContainHTML('')
+        // Искуственное событие
+        fireEvent.input(input, {
+            target: { value: '123' }
+        })
+        expect(screen.queryByTestId('value-elem')).toContainHTML('123')
+    })
+
+    it('useEvent', () => {
+        render(<MainPage />)
+        const input = screen.getByPlaceholderText(/input value/i)
+        // Событие пользователя
+        userEvent.type(input, 'Test text')
+        expect(screen.queryByTestId('value-elem')).toHaveTextContent(/^Test text$/)
+    })
 })
-
-describe('events', () => {
-    it('checkbox click', () => {
-        const handleChange = jest.fn()
-        const { container } = render(
-            <input type='checkbox' onChange={handleChange} />
-        )
-        const checkbox = container.firstChild
-        expect(checkbox).not.toBeChecked()
-        // fireEvent.click(checkbox)
-        userEvent.click(checkbox)
-        // userEvent.click(checkbox, { ctrlKey: true, shiftKey: true })
-        expect(handleChange).toHaveBeenCalledTimes(1)
-        expect(checkbox).toBeChecked()
-    });
-
-    it('double click', () => {
-        const onChange = jest.fn()
-        const { container } = render(<input type='checkbox' onChange={onChange} />)
-        const checkbox = container.firstChild
-        expect(checkbox).not.toBeChecked()
-        userEvent.dblClick(checkbox)
-        expect(onChange).toHaveBeenCalledTimes(2)
-    });
-
-    it('input focus', () => {
-        const { getByTestId } = render(
-            <input type="text" data-testid="simple-input" />
-        )
-        const input = getByTestId("simple-input")
-        expect(input).not.toHaveFocus()
-        input.focus()
-        expect(input).toHaveFocus()
-    });
-
-    it('tab focus', () => {
-        const { getAllByTestId } = render(
-            <div>
-                <input data-testid="element" type="text" />
-                <input data-testid="element" type="radio" />
-                <input data-testid="element" type="number" />
-            </div>
-        )
-        const [checkbox, radio, number] = getAllByTestId('element')
-        userEvent.tab()
-        expect(checkbox).toHaveFocus()
-        userEvent.tab()
-        expect(radio).toHaveFocus()
-        userEvent.tab()
-        expect(number).toHaveFocus()
-    });
-
-    it('select option', () => {
-        const { selectOptions, getByRole, getByText } = render(
-            <select>
-                <option value="1">A</option>
-                <option value="2">B</option>
-                <option value="3">C</option>
-            </select>
-        )
-
-        userEvent.selectOptions(getByRole('combobox'), '1')
-        expect(getByText('A').selected).toBeTruthy()
-
-        userEvent.selectOptions(getByRole('combobox'), '2')
-        expect(getByText('B').selected).toBeTruthy()
-        expect(getByText('A').selected).toBeFalsy()
-    });
-})
-
-/** Async test **/
-
-jest.mock('axios')
-
-const hits = [
-    {
-        objectID: '1',
-        title: 'Angular'
-    },
-    {
-        objectID: '2',
-        title: 'React'
-    }
-]
-
-describe('App', () => {
-    it('fetches news from an API (resolve)', async () => {
-        axios.get.mockImplementationOnce(() => Promise.resolve({ data: { hits } }))
-        const {getByRole, findAllByRole} = render(<App />)
-        userEvent.click(getByRole('button'))
-        const items = await findAllByRole('listitem')
-        expect(items).toHaveLength(2)
-        // Additional
-        expect(axios.get).toHaveBeenCalledTimes(1)
-        expect(axios.get).toHaveBeenCalledWith('http://hn.algolia.com/api/v1/search?query=React')
-    });
-
-    it('дополнительно с помошью act: fetches news from an API (resolve)', async () => {
-        const promise = Promise.resolve({ data: { hits } })
-        axios.get.mockImplementationOnce(() => promise)
-        const {getByRole, getAllByRole} = render(<App />)
-        userEvent.click(getByRole('button'))
-        await act(() => promise)
-        expect(getAllByRole('listitem')).toHaveLength(2)
-    });
-
-    it('fetches news from an API (reject)', async () => {
-        axios.get.mockImplementationOnce(() => Promise.reject(new Error()))
-        const {getByRole, findByText, queryByText, findByTestId} = render(<App />)
-
-        expect(queryByText(/Something went wrong/)).not.toBeInTheDocument()
-        userEvent.click(getByRole('button'))
-
-        const message = await findByText(/Something went wrong/)
-        expect(message).toBeInTheDocument()
-
-        const ul = await findByTestId('ul-test-id')
-        expect(ul.firstChild).not.toBeInTheDocument()
-    });
-})
-
-
-
-
-
-
